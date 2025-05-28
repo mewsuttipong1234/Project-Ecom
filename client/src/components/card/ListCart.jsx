@@ -1,25 +1,41 @@
 import { LayoutList} from "lucide-react";
 import useEcomStore from "../../store/ecom-store";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
+import {creatUserCart} from  "../../api/user"
+import { toast } from "react-toastify";
 
 
 const ListCart = () => {
-  const carts = useEcomStore((state) => state.carts);
+  const cart = useEcomStore((state) => state.carts);
+  const token = useEcomStore((state)=> state.token)
+  const user  = useEcomStore((state)=>state.user)
   const gettotalPrice = useEcomStore((state)=>state.gettotalPrice)
+
+  const navigate = useNavigate()
+
+  const handleSaveCart =async()=>{
+    await creatUserCart(token,{cart})
+    .then((res)=>{
+      toast.success('Add to Cart Success')
+      navigate('/checkout')
+    })
+    .catch((err)=>console.log(err))
+  }
+
 
   return (
     <div className="bg-gray-100 rounded-md p-4">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <LayoutList size={28} />
-        <p className="text-xl font-bold">รายการสินค้า {carts.length} รายการ</p>
+        <p className="text-xl font-bold">รายการสินค้า {cart.length} รายการ</p>
       </div>
 
       {/* Grid Layout */}
       <div className="grid md:grid-cols-3 gap-4">
         {/* Left - Cart Items */}
         <div className="md:col-span-2 space-y-4">
-          {carts.map((item) => (
+          {cart.map((item) => (
             <div
               key={item.id}
               className="flex justify-between bg-white p-3 rounded-lg shadow-md"
@@ -61,11 +77,22 @@ const ListCart = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-                <Link>
-                <button className="bg-red-500 hover:bg-red-700 text-white w-full py-2 rounded-md shadow">
+
+            {
+              user
+              ? <Link>
+                <button 
+                onClick={handleSaveCart}
+                className="bg-red-500 hover:bg-red-700 text-white w-full py-2 rounded-md shadow">
                     สั่งซื้อ
                 </button>
                 </Link>
+              : <Link to={'/login'}>
+                <button className="bg-blue-500 hover:bg-blue-700 text-white w-full py-2 rounded-md shadow">
+                    login
+                </button>
+                </Link>
+            }
                 
                 <Link to={'/shop'}>
                 <button className="bg-gray-500 hover:bg-gray-700 text-white w-full py-2 rounded-md shadow">

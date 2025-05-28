@@ -43,7 +43,7 @@ const roleRedirect =(role)=>{
   if(role === 'admin'){
     navigate('/admin')
   }else{
-    navigate('/')
+    navigate(-1)
     
   }
 }
